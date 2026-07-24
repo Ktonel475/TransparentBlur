@@ -1,0 +1,473 @@
+:root {
+    /* Background image */
+    --bg-image: url('https://r4.wallpaperflare.com/wallpaper/790/734/537/landscape-digital-art-coast-sky-wallpaper-2fbce811ee788644e4f742a5f338be69.jpg');
+
+    /* Blur scale */
+    --blur-xs: 2px;
+    --blur-sm: 6px;
+    --blur-md: 8px;
+    --blur-lg: 12px;
+    --blur-xl: 16px;
+
+    /* Surface color bases (RGB triples, combined with opacity vars below) */
+    --surface-ribbon-rgb: 35, 35, 35;
+    --surface-panel-rgb: 15, 15, 15;
+    --surface-panel-dark-rgb: 0, 0, 0;
+    --surface-tab-rgb: 30, 30, 30;
+    --surface-float-rgb: 20, 20, 20;
+    --surface-white-rgb: 255, 255, 255;
+
+    /* Opacity scale */
+    --opacity-panel-main: 0.62;
+    --opacity-panel-sidebar: 0.32;
+    --opacity-tab: 0.2;
+    --opacity-float: 0.3;
+    --opacity-float-soft: 0.25;
+    --opacity-card-base: 0.01;
+    --opacity-card-hover: 0.08;
+    --opacity-card-active: 0.14;
+    --opacity-input-bg: 0.08;
+    --opacity-input-bg-focus: 0.14;
+    --opacity-ring: 0.06;
+    --opacity-ring-focus: 0.18;
+
+    /* Spacing and radius */
+    --spacing-gap: 10px;
+    --radius-lg: 20px;
+    --radius-md: 12px;
+    --radius-pill: 999px;
+
+    /* Shadows */
+    --shadow-dimmed: 0 2px 10px rgba(0, 0, 0, 0.25),
+                      0 0 0 1px rgba(var(--surface-white-rgb), 0.03);
+    --shadow-lifted: 0 8px 32px rgba(0, 0, 0, 0.35),
+                      0 0 0 1px rgba(var(--surface-white-rgb), 0.06);
+    --shadow-soft-sm: 0 2px 12px rgba(0, 0, 0, 0.3),
+                       0 0 0 1px rgba(var(--surface-white-rgb), 0.05);
+
+    /* Card colors */
+    --card-bg: rgba(var(--surface-float-rgb), var(--opacity-card-base));
+    --card-bg-hover: rgba(var(--surface-white-rgb), var(--opacity-card-hover));
+    --card-bg-active: rgba(var(--surface-white-rgb), var(--opacity-card-active));
+
+    /* Input colors */
+    --input-bg: rgba(var(--surface-white-rgb), var(--opacity-input-bg));
+    --input-bg-focus: rgba(var(--surface-white-rgb), var(--opacity-input-bg-focus));
+    --input-ring: rgba(var(--surface-white-rgb), var(--opacity-ring));
+    --input-ring-focus: rgba(var(--surface-white-rgb), var(--opacity-ring-focus));
+
+    /* Text and list marker colors */
+    --text-color-normal: #f0f0f0;
+    --text-color-muted: #f0f0f0;
+    --text-color-faint: #d4d4d4;
+    --text-color-marker: #ffffff;
+
+    /* Content font weight */
+    --content-font-weight: 500;
+
+    /* Obsidian system variable overrides */
+    --text-normal: var(--text-color-normal) !important;
+    --text-muted: var(--text-color-muted) !important;
+    --text-faint: var(--text-color-faint) !important;
+    --list-marker-color: var(--text-color-marker) !important;
+    --font-weight: var(--content-font-weight) !important;
+}
+
+/* Global background image */
+body {
+    background-image: var(--bg-image);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+/* App container, workspace, tabs, titlebar, view content/header: strip default backgrounds so the body image shows through */
+.app-container,
+.workspace,
+.workspace-split,
+.workspace-leaf,
+.workspace-tabs,
+.workspace-tab-header-container,
+.workspace-tab-header.tappable:before,
+.workspace-tab-header.tappable:after,
+.workspace-ribbon.mod-left:before,
+.workspace-tab-header-inner:after,
+.titlebar,
+.view-content,
+.view-header {
+    background-color: transparent !important;
+}
+
+/* Left ribbon (activity bar) top border */
+.workspace-ribbon.mod-left:before {
+  border-bottom: none !important;
+}
+
+/* Left ribbon (activity bar) glass panel */
+.workspace-ribbon.mod-left.side-dock-ribbon.mod-left {
+    background-color: rgba(var(--surface-ribbon-rgb), var(--opacity-panel-main)) !important;
+    -webkit-backdrop-filter: blur(var(--blur-lg)) !important;
+    border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+    border: none !important;
+    gap: var(--spacing-gap);
+    margin-bottom: var(--spacing-gap) !important;
+}
+
+/* Pane resize handle */
+.workspace-leaf-resize-handle {
+  border-inline-end-style: none !important;
+  border-inline-start-style: none !important;
+}
+
+/* Top tab bar container */
+.workspace-tabs.mod-top .workspace-tab-container {
+  height: auto !important;
+  margin: var(--spacing-gap) 0;
+}
+
+/* Top tab bar container, left sidebar */
+.workspace-tabs.mod-top.mod-top-left-space .workspace-tab-container {
+  width: auto !important;
+  margin: var(--spacing-gap);
+}
+
+/* Tab bar container, right sidebar */
+.workspace-split.mod-horizontal.mod-sidedock.mod-right-split .workspace-tab-container {
+  width: auto !important;
+  margin: var(--spacing-gap);
+}
+
+/* Tab bar container, right-hand pane in main editor area */
+.workspace-split.mod-vertical.mod-root
+.workspace-tabs.mod-active.mod-top.mod-top-right-space
+.workspace-tab-container {
+  width: auto !important;
+  margin: var(--spacing-gap) var(--spacing-gap) var(--spacing-gap) 0;
+}
+
+/* Tab bar container, main editor area */
+.workspace-split.mod-vertical.mod-root
+.workspace-tabs.mod-active.mod-top
+.workspace-tab-container {
+  width: auto !important;
+  margin: var(--spacing-gap) 0 var(--spacing-gap) 0;
+}
+
+/* Main editor pane content (root split) */
+.workspace-split.mod-root .workspace-leaf-content {
+    background-color: rgba(var(--surface-panel-rgb), var(--opacity-panel-sidebar)) !important;
+    backdrop-filter: blur(var(--blur-lg)) !important;
+    -webkit-backdrop-filter: blur(var(--blur-lg)) !important;
+    border-radius: var(--radius-lg) !important;
+    border: none !important;
+    position: relative;
+    z-index: 2;
+}
+
+/* Left sidebar pane content (file explorer, etc.): dimmed and flattened so it recedes behind the main panel */
+.workspace-split.mod-left-split .workspace-leaf-content {
+    background-color: rgba(var(--surface-panel-rgb), var(--opacity-panel-sidebar)) !important;
+    backdrop-filter: blur(var(--blur-sm)) !important;
+    -webkit-backdrop-filter: blur(var(--blur-sm)) !important;
+    border-radius: var(--radius-lg) !important;
+    border: none !important;
+    opacity: 0.92;
+}
+
+/* Right sidebar pane content (outline, etc.): same recessed, flattened treatment */
+.workspace-split.mod-right-split .workspace-leaf-content {
+    background-color: rgba(var(--surface-panel-dark-rgb), var(--opacity-panel-sidebar)) !important;
+    backdrop-filter: blur(var(--blur-sm)) !important;
+    -webkit-backdrop-filter: blur(var(--blur-sm)) !important;
+    border-radius: var(--radius-lg) !important;
+    border: none !important;
+    box-shadow: var(--shadow-dimmed) !important;
+    opacity: 0.92;
+}
+
+/* Main editor view content: extra padding for breathing room */
+.workspace-split.mod-root .view-content {
+    padding: 4px 8px !important;
+}
+
+/* Top tab header container */
+.workspace-tab-header-container {
+    border-radius: var(--radius-md) !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Individual tab header pseudo-elements */
+.workspace-tab-header.tappable:before,
+.workspace-tab-header.tappable:after {
+  box-shadow: none !important;
+}
+
+/* Individual tab header */
+.workspace-tab-header {
+    background-color: rgba(var(--surface-tab-rgb), var(--opacity-tab)) !important;
+    backdrop-filter: blur(var(--blur-md)) !important;
+    -webkit-backdrop-filter: blur(var(--blur-md)) !important;
+    border-radius: var(--radius-pill) !important;
+    border: none !important;
+    margin: 2px 3px !important;
+}
+/* Active tab header */
+.workspace-tab-header.is-active {
+    background-color: var(--card-bg-active) !important;
+}
+
+/* Bottom status bar: detached from the edge into its own floating island */
+.status-bar {
+    background-color: rgba(var(--surface-float-rgb), var(--opacity-float)) !important;
+    backdrop-filter: blur(var(--blur-md)) !important;
+    -webkit-backdrop-filter: blur(var(--blur-md)) !important;
+    border: none !important;
+    border-radius: var(--radius-md) !important;
+    margin: var(--spacing-gap);
+    box-shadow: var(--shadow-soft-sm) !important;
+}
+
+/* Bottom-left vault name / settings block */
+.workspace-sidedock-vault-profile {
+    width: auto !important;
+    background-color: rgba(var(--surface-float-rgb), var(--opacity-float-soft)) !important;
+    background-image: none !important;
+    backdrop-filter: blur(var(--blur-sm)) !important;
+    -webkit-backdrop-filter: blur(var(--blur-sm)) !important;
+    border: none !important;
+    border-radius: var(--radius-md) !important;
+    margin: var(--spacing-gap);
+    box-shadow: var(--shadow-soft-sm) !important;
+}
+
+/* Modal backdrop overlay */
+.modal-bg {
+    background-color: rgba(var(--surface-panel-dark-rgb), 0.5) !important;
+}
+
+/* Modal dialog (settings, confirmation dialogs, etc.) */
+.modal-container .modal {
+    background-color: var(--card-bg) !important;
+    backdrop-filter: blur(var(--blur-xl)) !important;
+    -webkit-backdrop-filter: blur(var(--blur-xl)) !important;
+    border-radius: var(--radius-lg) !important;
+    border: none !important;
+    box-shadow: var(--shadow-lifted) !important;
+}
+
+/* Settings panel left navigation */
+.vertical-tab-header,
+.vertical-tab-content-container {
+    background-color: transparent !important;
+    border: none !important;
+}
+/* Settings panel left navigation, active item */
+.vertical-tab-nav-item.is-active {
+    background-color: var(--card-bg-active) !important;
+    border-radius: var(--radius-md) !important;
+}
+
+/* Command palette / quick switcher container */
+.prompt {
+    background-color: var(--card-bg) !important;
+    backdrop-filter: blur(var(--blur-xl)) !important;
+    -webkit-backdrop-filter: blur(var(--blur-xl)) !important;
+    border-radius: var(--radius-lg) !important;
+    border: none !important;
+    box-shadow: var(--shadow-lifted) !important;
+}
+/* Command palette / quick switcher suggestion item, selected or hovered */
+.suggestion-item.is-selected,
+.suggestion-item:hover {
+    background-color: var(--card-bg-hover) !important;
+    border-radius: var(--radius-md) !important;
+}
+
+/* Right-click context menu */
+.menu {
+    background-color: var(--card-bg) !important;
+    backdrop-filter: blur(var(--blur-xl)) !important;
+    -webkit-backdrop-filter: blur(var(--blur-xl)) !important;
+    border-radius: var(--radius-md) !important;
+    border: none !important;
+    box-shadow: var(--shadow-soft-sm) !important;
+}
+/* Right-click context menu item */
+.menu-item {
+    border-radius: 6px !important;
+}
+/* Right-click context menu item, hovered */
+.menu-item:hover {
+    background-color: var(--card-bg-hover) !important;
+}
+
+/* Tooltip */
+.tooltip {
+    background-color: var(--card-bg) !important;
+    backdrop-filter: blur(var(--blur-md)) !important;
+    -webkit-backdrop-filter: blur(var(--blur-md)) !important;
+    border: none !important;
+    border-radius: var(--radius-md) !important;
+    box-shadow: var(--shadow-soft-sm) !important;
+}
+
+/* Search box, command palette input, and general text inputs */
+input[type="text"],
+input[type="search"],
+.search-input-container input,
+.prompt-input {
+    background-color: var(--input-bg) !important;
+    border-radius: var(--radius-md) !important;
+    border: none !important;
+    box-shadow: 0 0 0 1px var(--input-ring) inset !important;
+    color: var(--text-color-normal) !important;
+}
+/* Search box, command palette input, and general text inputs, focused */
+input[type="text"]:focus,
+input[type="search"]:focus,
+.prompt-input:focus {
+    background-color: var(--input-bg-focus) !important;
+    box-shadow: 0 0 0 1px var(--input-ring-focus) inset !important;
+}
+
+/* Generic buttons and modal buttons */
+button,
+.modal button {
+    border-radius: var(--radius-pill) !important;
+    border: none !important;
+}
+/* Primary call-to-action button (e.g. Save, Confirm) */
+button.mod-cta {
+    background-color: hsl(var(--interactive-accent-hsl)) !important;
+    border-radius: var(--radius-pill) !important;
+    border: none !important;
+}
+
+/* Sidebar file/folder tree text and empty-state label */
+.workspace-leaf-content .tree-item-inner,
+.workspace-leaf-content .tree-item-flair,
+.workspace-leaf-content .search-empty-state {
+    color: #e0e0e0 !important;
+}
+/* File/folder tree item */
+.nav-file-title,
+.nav-folder-title,
+.tree-item-self {
+    border: none !important;
+}
+/* File/folder tree item, hovered */
+.nav-file-title:hover,
+.nav-folder-title:hover,
+.tree-item-self:hover {
+    background-color: var(--card-bg-hover) !important;
+    border-radius: var(--radius-pill) !important;
+}
+/* File/folder tree item, active (currently open file) */
+.nav-file-title.is-active,
+.tree-item-self.is-active {
+    background-color: var(--card-bg-active) !important;
+    border-radius: var(--radius-pill) !important;
+}
+/* File/folder tree item: side margin so the pill highlight doesn't touch the edges */
+.nav-file-title,
+.nav-folder-title,
+.tree-item-self {
+    margin: 1px 4px !important;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+/* Scrollbar track */
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+/* Scrollbar thumb */
+::-webkit-scrollbar-thumb {
+    background-color: rgba(var(--surface-white-rgb), 0.2);
+    border-radius: 10px;
+    border: none;
+    background-clip: content-box;
+}
+/* Scrollbar thumb, hovered */
+::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(var(--surface-white-rgb), 0.35);
+}
+
+/* Editor lines and rendered paragraphs/lists/tables: body text weight (text-shadow is a fake-bold trick to bypass Obsidian's bold rendering) */
+.markdown-source-view.mod-cm6 .cm-line,
+.markdown-rendered p,
+.markdown-rendered li,
+.markdown-rendered table {
+    font-weight: var(--content-font-weight) !important;
+    text-shadow: 0px 0px 0px rgba(200, 200, 200, 1) !important;
+}
+
+/* Highlighted (==mark==) text: remove the fake-bold text-shadow so it stays legible on its highlight background */
+.markdown-source-view.mod-cm6 .cm-line mark,
+.markdown-rendered mark,
+.markdown-source-view.mod-cm6 .cm-line mark strong,
+.markdown-rendered mark strong {
+    text-shadow: none !important;
+}
+
+/* Rendered headings: glow effect */
+.markdown-rendered h1,
+.markdown-rendered h2,
+.markdown-rendered h3,
+.markdown-rendered h4,
+.markdown-rendered h5,
+.markdown-rendered h6 {
+    text-shadow: 0 0 6px rgba(var(--surface-white-rgb), 0.5) !important;
+}
+
+/* Rendered table: rounded floating card instead of hard grid lines */
+.markdown-rendered table {
+    background-color: rgba(var(--surface-panel-dark-rgb), 0.25) !important;
+    border: none !important;
+    border-radius: var(--radius-md) !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    overflow: hidden !important;
+    box-shadow: var(--shadow-soft-sm) !important;
+}
+/* Rendered table cells */
+.markdown-rendered th,
+.markdown-rendered td {
+    border: none !important;
+}
+/* Rendered table header cells */
+.markdown-rendered th {
+    background-color: rgba(var(--surface-white-rgb), 0.15) !important;
+}
+
+/* Callout block */
+.markdown-rendered .callout {
+    background-color: rgba(var(--callout-color), 0.12) !important;
+    border: none !important;
+    border-radius: var(--radius-md) !important;
+    backdrop-filter: blur(var(--blur-md)) !important;
+    -webkit-backdrop-filter: blur(var(--blur-md)) !important;
+    box-shadow: var(--shadow-soft-sm) !important;
+}
+
+/* Spoiler-answer block (hides quiz answers/spoilers until hovered) */
+.spoiler-answer {
+    color: transparent !important;
+    background-color: rgba(var(--surface-white-rgb), 0.4) !important;
+    border-radius: var(--radius-md);
+    padding: 0 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-shadow: none !important;
+}
+
+/* Spoiler-answer block, hovered: reveal text and fade the background */
+.spoiler-answer:hover {
+    color: var(--text-color-normal) !important;
+    background-color: rgba(var(--surface-white-rgb), 0.1) !important;
+}
