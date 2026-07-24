@@ -140,24 +140,18 @@ body {
 }
 
 .workspace:not(.is-left-sidedock-open):not(.is-right-sidedock-open)
-.workspace-split.mod-vertical.mod-root
-.workspace-tab-container {
-  width: auto !important;  
-  margin: var(--spacing-gap);
+.workspace-split.mod-vertical.mod-root {
+  margin: 0 var(--spacing-gap) var(--spacing-gap) var(--spacing-gap);
 }
 
 .workspace.is-left-sidedock-open:not(.is-right-sidedock-open)
-.workspace-split.mod-vertical.mod-root
-.workspace-tab-container {
-  width: auto !important;  
-  margin: var(--spacing-gap) var(--spacing-gap) var(--spacing-gap) 0;
+.workspace-split.mod-vertical.mod-root {
+  margin: 0 var(--spacing-gap) var(--spacing-gap) 0;
 }
 
 .workspace:not(.is-left-sidedock-open).is-right-sidedock-open
-.workspace-split.mod-vertical.mod-root
-.workspace-tab-container {
-  width: auto !important;  
-  margin: var(--spacing-gap) 0 var(--spacing-gap) var(--spacing-gap); 
+.workspace-split.mod-vertical.mod-root {
+  margin: 0 0 0 var(--spacing-gap); 
 }
 
 
