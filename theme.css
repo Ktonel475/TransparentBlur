@@ -127,7 +127,8 @@ body {
 }
 
 /* Top tab bar container, left sidebar */
-.workspace-tabs.mod-top.mod-top-left-space .workspace-tab-container {
+.workspace.is-left-sidedock-open
+.workspace-split.mod-horizontal.mod-sidedock.mod-left-split  .workspace-tab-container {
   width: auto !important;
   margin: var(--spacing-gap);
 }
@@ -138,21 +139,27 @@ body {
   margin: var(--spacing-gap);
 }
 
-/* Tab bar container, right-hand pane in main editor area */
+.workspace:not(.is-left-sidedock-open):not(.is-right-sidedock-open)
 .workspace-split.mod-vertical.mod-root
-.workspace-tabs.mod-active.mod-top.mod-top-right-space
 .workspace-tab-container {
-  width: auto !important;
+  width: auto !important;  
+  margin: var(--spacing-gap);
+}
+
+.workspace.is-left-sidedock-open:not(.is-right-sidedock-open)
+.workspace-split.mod-vertical.mod-root
+.workspace-tab-container {
+  width: auto !important;  
   margin: var(--spacing-gap) var(--spacing-gap) var(--spacing-gap) 0;
 }
 
-/* Tab bar container, main editor area */
+.workspace:not(.is-left-sidedock-open).is-right-sidedock-open
 .workspace-split.mod-vertical.mod-root
-.workspace-tabs.mod-active.mod-top
 .workspace-tab-container {
-  width: auto !important;
-  margin: var(--spacing-gap) 0 var(--spacing-gap) 0;
+  width: auto !important;  
+  margin: var(--spacing-gap) 0 var(--spacing-gap) var(--spacing-gap); 
 }
+
 
 /* Main editor pane content (root split) */
 .workspace-split.mod-root .workspace-leaf-content {
