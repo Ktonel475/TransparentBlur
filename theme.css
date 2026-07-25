@@ -80,6 +80,10 @@ body {
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: fixed;
+    --background-primary: rgba(20, 20, 20, 0.5);
+    --background-secondary: rgba(20, 20, 20, 0.25);
+    --bases-table-header-background: rgba(20, 20, 20, 0.25);
+    --bases-table-group-background: rgba(20, 20, 20, 0.25);
 }
 
 /* App container, workspace, tabs, titlebar, view content/header: strip default backgrounds so the body image shows through */
