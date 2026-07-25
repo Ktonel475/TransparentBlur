@@ -116,14 +116,21 @@ body {
 
 /* Pane resize handle */
 .workspace-leaf-resize-handle {
-  border-inline-end-style: none !important;
-  border-inline-start-style: none !important;
+  border-style: none !important;
 }
 
 /* Top tab bar container */
-.workspace-tabs.mod-top .workspace-tab-container {
+.workspace-tabs .workspace-tab-container {
   height: auto !important;
   margin: var(--spacing-gap) 0;
+}
+
+.workspace-split.mod-vertical.mod-root {
+  gap: var(--spacing-gap);
+}
+
+.workspace-tabs {
+
 }
 
 /* Top tab bar container, left sidebar */
@@ -213,10 +220,12 @@ body {
     border-radius: var(--radius-pill) !important;
     border: none !important;
     margin: 2px 3px !important;
+    color: #f0f0f0 !important;
 }
 /* Active tab header */
 .workspace-tab-header.is-active {
     background-color: var(--card-bg-active) !important;
+    color: #ffffff !important;
 }
 
 /* Bottom status bar: detached from the edge into its own floating island */
