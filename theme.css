@@ -80,10 +80,14 @@ body {
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: fixed;
-    --background-primary: rgba(20, 20, 20, 0.5);
+    --background-primary: rgba(20, 20, 20, 0);
     --background-secondary: rgba(20, 20, 20, 0.25);
     --bases-table-header-background: rgba(20, 20, 20, 0.25);
     --bases-table-group-background: rgba(20, 20, 20, 0.25);
+    --icon-color: #fefefe;
+    --text-normal: #fefefe
+    --text-muted: #f0f0f0;
+    --text-faint: #9f9f9f;
 }
 
 /* App container, workspace, tabs, titlebar, view content/header: strip default backgrounds so the body image shows through */
@@ -131,10 +135,6 @@ body {
 
 .workspace-split.mod-vertical.mod-root {
   gap: var(--spacing-gap);
-}
-
-.workspace-tabs {
-
 }
 
 /* Top tab bar container, left sidebar */
