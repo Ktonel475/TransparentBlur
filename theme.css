@@ -84,6 +84,7 @@ body {
     --background-secondary: rgba(20, 20, 20, 0.25);
     --bases-table-header-background: rgba(20, 20, 20, 0.25);
     --bases-table-group-background: rgba(20, 20, 20, 0.25);
+    --code-background: rgba(20, 20, 20, 0.7);
     --icon-color: #fefefe;
     --text-normal: #fefefe
     --text-muted: #f0f0f0;
