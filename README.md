@@ -3,11 +3,11 @@
 
 ## Previews
 Main area 
-[Main](Main.png)
+![Main](Main.png)
 Settings
-[Settings](Settings.png)
+![Settings](Settings.png)
 Graph View
-[Graph](Graph.png)
+![Graph](Graph.png)
 
 ## Milestone
 - add border theme glass blur (unified)
