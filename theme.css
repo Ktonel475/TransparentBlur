@@ -1,3 +1,36 @@
+/* =========================================================================
+   HOW THIS FILE AVOIDS !important
+   =========================================================================
+   Obsidian loads CSS in this order: core app CSS -> active theme CSS ->
+   your snippets, last. That means at EQUAL selector specificity, a snippet
+   rule already wins over the theme without any !important — it just has
+   to not lose the specificity contest outright.
+
+   Two techniques are used below instead of !important:
+
+   1. Cascade order (the default). Most rules here target the exact same
+      classes Obsidian/themes use for these elements at the same
+      specificity, so plain source order settles it in our favor.
+
+   2. Selector doubling, e.g. `.workspace-tab-header.workspace-tab-header`.
+      Repeating a class in a compound selector doesn't change what it
+      matches, it only adds one extra "class" to the specificity count.
+      This is used on the handful of elements themes most commonly restyle
+      (tabs, status bar, modals, menus, tooltips, accent buttons, tables,
+      callouts) as a safety margin, in case a given theme happens to style
+      that element with a slightly higher-specificity selector than ours.
+
+   The one place a real specificity fight is likely — Obsidian's own
+   system CSS variables (--text-normal, --background-primary, etc.), which
+   themes typically set on `.theme-dark` / `.theme-light` — is handled by
+   scoping our override to `body.theme-dark, body.theme-light`, which
+   outranks a bare `.theme-dark` class rule.
+
+   If you find one specific rule still losing after installing this on top
+   of a particular theme, the fix is to double that rule's class one more
+   time (`.foo.foo.foo`), not to add !important back.
+   ========================================================================= */
+
 :root {
     /* Background image */
     --bg-image: url('https://r4.wallpaperflare.com/wallpaper/790/734/537/landscape-digital-art-coast-sky-wallpaper-2fbce811ee788644e4f742a5f338be69.jpg');
@@ -64,13 +97,21 @@
 
     /* Content font weight */
     --content-font-weight: 500;
+}
 
-    /* Obsidian system variable overrides */
-    --text-normal: var(--text-color-normal) !important;
-    --text-muted: var(--text-color-muted) !important;
-    --text-faint: var(--text-color-faint) !important;
-    --list-marker-color: var(--text-color-marker) !important;
-    --font-weight: var(--content-font-weight) !important;
+body.theme-dark,
+body.theme-light {
+    --background-primary: rgba(var(--surface-float-rgb), 0);
+    --background-secondary: rgba(var(--surface-float-rgb), 0.25);
+    --bases-table-header-background: rgba(var(--surface-float-rgb), 0.25);
+    --bases-table-group-background: rgba(var(--surface-float-rgb), 0.25);
+    --code-background: rgba(var(--surface-float-rgb), 0.7);
+    --icon-color: #fefefe;
+    --text-normal: var(--text-color-normal);
+    --text-muted: var(--text-color-muted);
+    --text-faint: var(--text-color-faint);
+    --list-marker-color: var(--text-color-marker);
+    --font-weight: var(--content-font-weight);
 }
 
 /* Global background image */
@@ -80,57 +121,81 @@ body {
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: fixed;
-    --background-primary: rgba(20, 20, 20, 0);
-    --background-secondary: rgba(20, 20, 20, 0.25);
-    --bases-table-header-background: rgba(20, 20, 20, 0.25);
-    --bases-table-group-background: rgba(20, 20, 20, 0.25);
-    --code-background: rgba(20, 20, 20, 0.7);
-    --icon-color: #fefefe;
-    --text-normal: #fefefe;
-    --text-muted: #f0f0f0;
-    --text-faint: #9f9f9f;
 }
 
-/* App container, workspace, tabs, titlebar, view content/header: strip default backgrounds so the body image shows through */
-.app-container,
-.workspace,
-.workspace-split,
-.workspace-leaf,
-.workspace-tabs,
-.workspace-tab-header-container,
-.workspace-tab-header.tappable:before,
-.workspace-tab-header.tappable:after,
-.workspace-ribbon.mod-left:before,
-.workspace-tab-header-inner:after,
-.titlebar,
-.view-content,
-.view-header {
-    background-color: transparent !important;
+/* App container, workspace, tabs, titlebar, view content/header: strip default backgrounds so the body image shows through
+   (each class below is doubled — e.g. `.workspace.workspace` — purely to add
+   specificity headroom; it doesn't change what the selector matches) */
+.app-container.app-container,
+.workspace.workspace,
+.workspace-split.workspace-split,
+.workspace-leaf.workspace-leaf,
+.workspace-tabs.workspace-tabs,
+.workspace-tab-header-container.workspace-tab-header-container,
+.workspace-tab-header.workspace-tab-header.tappable:before,
+.workspace-tab-header.workspace-tab-header.tappable:after,
+.workspace-ribbon.mod-left.mod-left:before,
+.titlebar.titlebar,
+.view-content.view-content,
+.view-header.view-header {
+    background-color: transparent;
+}
+
+/* Tab-to-tab divider line (the ::after on each tab's inner content).
+   Confirmed via devtools: Obsidian's own app.css sets this at
+   `.workspace .mod-root .workspace-tab-header-inner::after`
+   (3 classes + pseudo-element = specificity 0,3,1). Anchoring to the real
+   parent `.workspace-tab-header` and tripling the target class gives
+   0,4,1 here, which clears theirs outright rather than tying. */
+.workspace-tab-header .workspace-tab-header-inner.workspace-tab-header-inner.workspace-tab-header-inner::after {
+    background-color: transparent;
+}
+
+.workspace-tab-header-container .workspace-tab-header.workspace-tab-header::before,
+.workspace-tab-header-container .workspace-tab-header.workspace-tab-header::after {
+  content: none;
 }
 
 /* Left ribbon (activity bar) top border */
-.workspace-ribbon.mod-left:before {
-  border-bottom: none !important;
+.workspace-ribbon.mod-left.mod-left:before {
+  border-bottom: none;
 }
 
 /* Left ribbon (activity bar) glass panel */
 .workspace-ribbon.mod-left.side-dock-ribbon.mod-left {
-    background-color: rgba(var(--surface-ribbon-rgb), var(--opacity-panel-main)) !important;
-    -webkit-backdrop-filter: blur(var(--blur-lg)) !important;
+    background-color: rgba(var(--surface-ribbon-rgb), var(--opacity-panel-main));
+    -webkit-backdrop-filter: blur(var(--blur-lg));
     border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
-    border: none !important;
+    border: none;
     gap: var(--spacing-gap);
-    margin-bottom: var(--spacing-gap) !important;
+    margin-bottom: var(--spacing-gap);
 }
 
-/* Pane resize handle */
-.workspace-leaf-resize-handle {
-  border-style: none !important;
+/* Pane resize handle: invisible at rest so it blends into the glass panels,
+   with a soft highlight on hover/drag so it stays easy to find.
+   Obsidian's own core CSS (app.css) draws this border with the *logical*
+   properties border-inline-end-style / border-inline-end-width (for RTL
+   support), scoped to a 3-class selector like
+   `.workspace-split.mod-vertical > * > .workspace-leaf-resize-handle`.
+   border-inline-style / border-block-style are the logical shorthands that
+   cover both the "start" and "end" side in each axis, so one line each
+   handles horizontal and vertical splits. `.workspace-split` plus a tripled
+   class here gives specificity 0,4,0 — a clear win over their 0,3,0,
+   instead of leaning on a tie. */
+.workspace-split .workspace-leaf-resize-handle.workspace-leaf-resize-handle.workspace-leaf-resize-handle {
+  border-inline-style: none;
+  border-block-style: none;
+  background-color: transparent;
+  transition: background-color 0.15s ease;
+}
+.workspace-split .workspace-leaf-resize-handle.workspace-leaf-resize-handle.workspace-leaf-resize-handle:hover,
+.workspace-split .workspace-leaf-resize-handle.workspace-leaf-resize-handle.workspace-leaf-resize-handle:active {
+  background-color: rgba(var(--surface-white-rgb), 0.18);
 }
 
 /* Top tab bar container */
 .workspace-tabs .workspace-tab-container {
-  height: auto !important;
+  height: auto;
   margin: var(--spacing-gap) 0;
 }
 
@@ -141,13 +206,13 @@ body {
 /* Top tab bar container, left sidebar */
 .workspace.is-left-sidedock-open
 .workspace-split.mod-horizontal.mod-sidedock.mod-left-split  .workspace-tab-container {
-  width: auto !important;
+  width: auto;
   margin: var(--spacing-gap);
 }
 
 /* Tab bar container, right sidebar */
 .workspace-split.mod-horizontal.mod-sidedock.mod-right-split .workspace-tab-container {
-  width: auto !important;
+  width: auto;
   margin: var(--spacing-gap);
 }
 
@@ -168,164 +233,164 @@ body {
 
 
 /* Main editor pane content (root split) */
-.workspace-split.mod-root .workspace-leaf-content {
-    background-color: rgba(var(--surface-panel-rgb), var(--opacity-panel-sidebar)) !important;
-    backdrop-filter: blur(var(--blur-lg)) !important;
-    -webkit-backdrop-filter: blur(var(--blur-lg)) !important;
-    border-radius: var(--radius-lg) !important;
-    border: none !important;
+.workspace-split.mod-root .workspace-leaf-content.workspace-leaf-content {
+    background-color: rgba(var(--surface-panel-rgb), var(--opacity-panel-sidebar));
+    backdrop-filter: blur(var(--blur-lg));
+    -webkit-backdrop-filter: blur(var(--blur-lg));
+    border-radius: var(--radius-lg);
+    border: none;
     position: relative;
     z-index: 2;
 }
 
 /* Left sidebar pane content (file explorer, etc.): dimmed and flattened so it recedes behind the main panel */
-.workspace-split.mod-left-split .workspace-leaf-content {
-    background-color: rgba(var(--surface-panel-rgb), var(--opacity-panel-sidebar)) !important;
-    backdrop-filter: blur(var(--blur-sm)) !important;
-    -webkit-backdrop-filter: blur(var(--blur-sm)) !important;
-    border-radius: var(--radius-lg) !important;
-    border: none !important;
+.workspace-split.mod-left-split .workspace-leaf-content.workspace-leaf-content {
+    background-color: rgba(var(--surface-panel-rgb), var(--opacity-panel-sidebar));
+    backdrop-filter: blur(var(--blur-sm));
+    -webkit-backdrop-filter: blur(var(--blur-sm));
+    border-radius: var(--radius-lg);
+    border: none;
     opacity: 0.92;
 }
 
 /* Right sidebar pane content (outline, etc.): same recessed, flattened treatment */
-.workspace-split.mod-right-split .workspace-leaf-content {
-    background-color: rgba(var(--surface-panel-dark-rgb), var(--opacity-panel-sidebar)) !important;
-    backdrop-filter: blur(var(--blur-sm)) !important;
-    -webkit-backdrop-filter: blur(var(--blur-sm)) !important;
-    border-radius: var(--radius-lg) !important;
-    border: none !important;
-    box-shadow: var(--shadow-dimmed) !important;
+.workspace-split.mod-right-split .workspace-leaf-content.workspace-leaf-content {
+    background-color: rgba(var(--surface-panel-dark-rgb), var(--opacity-panel-sidebar));
+    backdrop-filter: blur(var(--blur-sm));
+    -webkit-backdrop-filter: blur(var(--blur-sm));
+    border-radius: var(--radius-lg);
+    border: none;
+    box-shadow: var(--shadow-dimmed);
     opacity: 0.92;
 }
 
 /* Main editor view content: extra padding for breathing room */
 .workspace-split.mod-root .view-content {
-    padding: 4px 8px !important;
+    padding: 4px 8px;
 }
 
 /* Top tab header container */
-.workspace-tab-header-container {
-    border-radius: var(--radius-md) !important;
-    border: none !important;
-    box-shadow: none !important;
+.workspace-tab-header-container.workspace-tab-header-container {
+    border-radius: var(--radius-md);
+    border: none;
+    box-shadow: none;
 }
 
 /* Individual tab header pseudo-elements */
-.workspace-tab-header.tappable:before,
-.workspace-tab-header.tappable:after {
-  box-shadow: none !important;
+.workspace-tab-header.workspace-tab-header.tappable:before,
+.workspace-tab-header.workspace-tab-header.tappable:after {
+  box-shadow: none;
 }
 
 /* Individual tab header */
-.workspace-tab-header {
-    background-color: rgba(var(--surface-tab-rgb), var(--opacity-tab)) !important;
-    backdrop-filter: blur(var(--blur-md)) !important;
-    -webkit-backdrop-filter: blur(var(--blur-md)) !important;
-    border-radius: var(--radius-pill) !important;
-    border: none !important;
-    margin: 2px 3px !important;
-    color: #f0f0f0 !important;
+.workspace-tab-header.workspace-tab-header {
+    background-color: rgba(var(--surface-tab-rgb), var(--opacity-tab));
+    backdrop-filter: blur(var(--blur-md));
+    -webkit-backdrop-filter: blur(var(--blur-md));
+    border-radius: var(--radius-pill);
+    border: none;
+    margin: 2px 3px;
+    color: #f0f0f0;
 }
 /* Active tab header */
-.workspace-tab-header.is-active {
-    background-color: var(--card-bg-active) !important;
-    color: #ffffff !important;
+.workspace-tab-header.workspace-tab-header.is-active {
+    background-color: var(--card-bg-active);
+    color: #ffffff;
 }
 
 /* Bottom status bar: detached from the edge into its own floating island */
-.status-bar {
-    background-color: rgba(var(--surface-float-rgb), var(--opacity-float)) !important;
-    backdrop-filter: blur(var(--blur-md)) !important;
-    -webkit-backdrop-filter: blur(var(--blur-md)) !important;
-    border: none !important;
-    border-radius: var(--radius-md) !important;
+.status-bar.status-bar {
+    background-color: rgba(var(--surface-float-rgb), var(--opacity-float));
+    backdrop-filter: blur(var(--blur-md));
+    -webkit-backdrop-filter: blur(var(--blur-md));
+    border: none;
+    border-radius: var(--radius-md);
     margin: var(--spacing-gap);
-    box-shadow: var(--shadow-soft-sm) !important;
+    box-shadow: var(--shadow-soft-sm);
 }
 
 /* Bottom-left vault name / settings block */
-.workspace-sidedock-vault-profile {
-    width: auto !important;
-    background-color: rgba(var(--surface-float-rgb), var(--opacity-float-soft)) !important;
-    background-image: none !important;
-    backdrop-filter: blur(var(--blur-sm)) !important;
-    -webkit-backdrop-filter: blur(var(--blur-sm)) !important;
-    border: none !important;
-    border-radius: var(--radius-md) !important;
+.workspace-sidedock-vault-profile.workspace-sidedock-vault-profile {
+    width: auto;
+    background-color: rgba(var(--surface-float-rgb), var(--opacity-float-soft));
+    background-image: none;
+    backdrop-filter: blur(var(--blur-sm));
+    -webkit-backdrop-filter: blur(var(--blur-sm));
+    border: none;
+    border-radius: var(--radius-md);
     margin: var(--spacing-gap);
-    box-shadow: var(--shadow-soft-sm) !important;
+    box-shadow: var(--shadow-soft-sm);
 }
 
 /* Modal backdrop overlay */
-.modal-bg {
-    background-color: rgba(var(--surface-panel-dark-rgb), 0.5) !important;
+.modal-bg.modal-bg {
+    background-color: rgba(var(--surface-panel-dark-rgb), 0.5);
 }
 
 /* Modal dialog (settings, confirmation dialogs, etc.) */
-.modal-container .modal {
-    background-color: var(--card-bg) !important;
-    backdrop-filter: blur(var(--blur-xl)) !important;
-    -webkit-backdrop-filter: blur(var(--blur-xl)) !important;
-    border-radius: var(--radius-lg) !important;
-    border: none !important;
-    box-shadow: var(--shadow-lifted) !important;
+.modal-container .modal.modal {
+    background-color: var(--card-bg);
+    backdrop-filter: blur(var(--blur-xl));
+    -webkit-backdrop-filter: blur(var(--blur-xl));
+    border-radius: var(--radius-lg);
+    border: none;
+    box-shadow: var(--shadow-lifted);
 }
 
 /* Settings panel left navigation */
-.vertical-tab-header,
-.vertical-tab-content-container {
-    background-color: transparent !important;
-    border: none !important;
+.vertical-tab-header.vertical-tab-header,
+.vertical-tab-content-container.vertical-tab-content-container {
+    background-color: transparent;
+    border: none;
 }
 /* Settings panel left navigation, active item */
-.vertical-tab-nav-item.is-active {
-    background-color: var(--card-bg-active) !important;
-    border-radius: var(--radius-md) !important;
+.vertical-tab-nav-item.vertical-tab-nav-item.is-active {
+    background-color: var(--card-bg-active);
+    border-radius: var(--radius-md);
 }
 
 /* Command palette / quick switcher container */
-.prompt {
-    background-color: var(--card-bg) !important;
-    backdrop-filter: blur(var(--blur-xl)) !important;
-    -webkit-backdrop-filter: blur(var(--blur-xl)) !important;
-    border-radius: var(--radius-lg) !important;
-    border: none !important;
-    box-shadow: var(--shadow-lifted) !important;
+.prompt.prompt {
+    background-color: var(--card-bg);
+    backdrop-filter: blur(var(--blur-xl));
+    -webkit-backdrop-filter: blur(var(--blur-xl));
+    border-radius: var(--radius-lg);
+    border: none;
+    box-shadow: var(--shadow-lifted);
 }
 /* Command palette / quick switcher suggestion item, selected or hovered */
-.suggestion-item.is-selected,
-.suggestion-item:hover {
-    background-color: var(--card-bg-hover) !important;
-    border-radius: var(--radius-md) !important;
+.suggestion-item.suggestion-item.is-selected,
+.suggestion-item.suggestion-item:hover {
+    background-color: var(--card-bg-hover);
+    border-radius: var(--radius-md);
 }
 
 /* Right-click context menu */
-.menu {
-    background-color: var(--card-bg) !important;
-    backdrop-filter: blur(var(--blur-xl)) !important;
-    -webkit-backdrop-filter: blur(var(--blur-xl)) !important;
-    border-radius: var(--radius-md) !important;
-    border: none !important;
-    box-shadow: var(--shadow-soft-sm) !important;
+.menu.menu {
+    background-color: var(--card-bg);
+    backdrop-filter: blur(var(--blur-xl));
+    -webkit-backdrop-filter: blur(var(--blur-xl));
+    border-radius: var(--radius-md);
+    border: none;
+    box-shadow: var(--shadow-soft-sm);
 }
 /* Right-click context menu item */
-.menu-item {
-    border-radius: 6px !important;
+.menu-item.menu-item {
+    border-radius: 6px;
 }
 /* Right-click context menu item, hovered */
-.menu-item:hover {
-    background-color: var(--card-bg-hover) !important;
+.menu-item.menu-item:hover {
+    background-color: var(--card-bg-hover);
 }
 
 /* Tooltip */
-.tooltip {
-    background-color: var(--card-bg) !important;
-    backdrop-filter: blur(var(--blur-md)) !important;
-    -webkit-backdrop-filter: blur(var(--blur-md)) !important;
-    border: none !important;
-    border-radius: var(--radius-md) !important;
-    box-shadow: var(--shadow-soft-sm) !important;
+.tooltip.tooltip {
+    background-color: var(--card-bg);
+    backdrop-filter: blur(var(--blur-md));
+    -webkit-backdrop-filter: blur(var(--blur-md));
+    border: none;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-soft-sm);
 }
 
 /* Search box, command palette input, and general text inputs */
@@ -333,63 +398,64 @@ input[type="text"],
 input[type="search"],
 .search-input-container input,
 .prompt-input {
-    background-color: var(--input-bg) !important;
-    border-radius: var(--radius-md) !important;
-    border: none !important;
-    box-shadow: 0 0 0 1px var(--input-ring) inset !important;
-    color: var(--text-color-normal) !important;
+    background-color: var(--input-bg);
+    border-radius: var(--radius-md);
+    border: none;
+    box-shadow: 0 0 0 1px var(--input-ring) inset;
+    color: var(--text-color-normal);
 }
 /* Search box, command palette input, and general text inputs, focused */
 input[type="text"]:focus,
 input[type="search"]:focus,
 .prompt-input:focus {
-    background-color: var(--input-bg-focus) !important;
-    box-shadow: 0 0 0 1px var(--input-ring-focus) inset !important;
+    background-color: var(--input-bg-focus);
+    box-shadow: 0 0 0 1px var(--input-ring-focus) inset;
 }
 
 /* Generic buttons and modal buttons */
 button,
 .modal button {
-    border-radius: var(--radius-pill) !important;
-    border: none !important;
+    border-radius: var(--radius-pill);
+    border: none;
 }
-/* Primary call-to-action button (e.g. Save, Confirm) */
-button.mod-cta {
-    background-color: hsl(var(--interactive-accent-hsl)) !important;
-    border-radius: var(--radius-pill) !important;
-    border: none !important;
+/* Primary call-to-action button (e.g. Save, Confirm) — doubled since accent
+   buttons are one of the things themes most often restyle */
+button.mod-cta.mod-cta {
+    background-color: hsl(var(--interactive-accent-hsl));
+    border-radius: var(--radius-pill);
+    border: none;
 }
 
 /* Sidebar file/folder tree text and empty-state label */
-.workspace-leaf-content .tree-item-inner,
-.workspace-leaf-content .tree-item-flair,
-.workspace-leaf-content .search-empty-state {
-    color: #e0e0e0 !important;
+.workspace-leaf-content .tree-item-inner.tree-item-inner,
+.workspace-leaf-content .tree-item-flair.tree-item-flair,
+.workspace-leaf-content .search-empty-state.search-empty-state {
+    color: #e0e0e0;
 }
 /* File/folder tree item */
 .nav-file-title,
 .nav-folder-title,
 .tree-item-self {
-    border: none !important;
+    border: none;
 }
 /* File/folder tree item, hovered */
-.nav-file-title:hover,
-.nav-folder-title:hover,
-.tree-item-self:hover {
-    background-color: var(--card-bg-hover) !important;
-    border-radius: var(--radius-pill) !important;
+.nav-file-title.nav-file-title:hover,
+.nav-folder-title.nav-folder-title:hover,
+.tree-item-self.tree-item-self:hover {
+    background-color: var(--card-bg-hover);
+    border-radius: var(--radius-pill);
 }
 /* File/folder tree item, active (currently open file) */
-.nav-file-title.is-active,
-.tree-item-self.is-active {
-    background-color: var(--card-bg-active) !important;
-    border-radius: var(--radius-pill) !important;
+.nav-file-title.nav-file-title.is-active,
+.tree-item-self.tree-item-self.is-active {
+    background-color: var(--card-bg-active);
+    border-radius: var(--radius-pill);
 }
 /* File/folder tree item: side margin so the pill highlight doesn't touch the edges */
 .nav-file-title,
 .nav-folder-title,
 .tree-item-self {
-    margin: 1px 4px !important;
+    margin: 1px 4px;
 }
 
 /* Scrollbar */
@@ -413,76 +479,82 @@ button.mod-cta {
     background-color: rgba(var(--surface-white-rgb), 0.35);
 }
 
-/* Editor lines and rendered paragraphs/lists/tables: body text weight (text-shadow is a fake-bold trick to bypass Obsidian's bold rendering) */
-.markdown-source-view.mod-cm6 .cm-line,
-.markdown-rendered p,
-.markdown-rendered li,
-.markdown-rendered table {
-    font-weight: var(--content-font-weight) !important;
-    text-shadow: 0px 0px 0px rgba(200, 200, 200, 1) !important;
+/* Editor lines and rendered paragraphs/lists/tables: body text weight (text-shadow is a fake-bold trick to bypass Obsidian's bold rendering)
+   `.markdown-rendered` is doubled throughout this section — reading-view
+   typography (headings, tables, callouts) is the single most commonly
+   restyled category across community themes, so this is the one place
+   worth the extra specificity margin everywhere. */
+.markdown-source-view.mod-cm6 .cm-line.cm-line,
+.markdown-rendered.markdown-rendered p,
+.markdown-rendered.markdown-rendered li,
+.markdown-rendered.markdown-rendered table {
+    font-weight: var(--content-font-weight);
+    text-shadow: 0px 0px 0px rgba(200, 200, 200, 1);
 }
 
 /* Highlighted (==mark==) text: remove the fake-bold text-shadow so it stays legible on its highlight background */
-.markdown-source-view.mod-cm6 .cm-line mark,
-.markdown-rendered mark,
-.markdown-source-view.mod-cm6 .cm-line mark strong,
-.markdown-rendered mark strong {
-    text-shadow: none !important;
+.markdown-source-view.mod-cm6 .cm-line.cm-line mark,
+.markdown-rendered.markdown-rendered mark,
+.markdown-source-view.mod-cm6 .cm-line.cm-line mark strong,
+.markdown-rendered.markdown-rendered mark strong {
+    text-shadow: none;
 }
 
 /* Rendered headings: glow effect */
-.markdown-rendered h1,
-.markdown-rendered h2,
-.markdown-rendered h3,
-.markdown-rendered h4,
-.markdown-rendered h5,
-.markdown-rendered h6 {
-    text-shadow: 0 0 6px rgba(var(--surface-white-rgb), 0.5) !important;
+.markdown-rendered.markdown-rendered h1,
+.markdown-rendered.markdown-rendered h2,
+.markdown-rendered.markdown-rendered h3,
+.markdown-rendered.markdown-rendered h4,
+.markdown-rendered.markdown-rendered h5,
+.markdown-rendered.markdown-rendered h6 {
+    text-shadow: 0 0 6px rgba(var(--surface-white-rgb), 0.5);
 }
 
 /* Rendered table: rounded floating card instead of hard grid lines */
-.markdown-rendered table {
-    background-color: rgba(var(--surface-panel-dark-rgb), 0.25) !important;
-    border: none !important;
-    border-radius: var(--radius-md) !important;
-    border-collapse: separate !important;
-    border-spacing: 0 !important;
-    overflow: hidden !important;
-    box-shadow: var(--shadow-soft-sm) !important;
+.markdown-rendered.markdown-rendered table {
+    background-color: rgba(var(--surface-panel-dark-rgb), 0.25);
+    border: none;
+    border-radius: var(--radius-md);
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: hidden;
+    box-shadow: var(--shadow-soft-sm);
 }
 /* Rendered table cells */
-.markdown-rendered th,
-.markdown-rendered td {
-    border: none !important;
+.markdown-rendered.markdown-rendered th,
+.markdown-rendered.markdown-rendered td {
+    border: none;
 }
 /* Rendered table header cells */
-.markdown-rendered th {
-    background-color: rgba(var(--surface-white-rgb), 0.15) !important;
+.markdown-rendered.markdown-rendered th {
+    background-color: rgba(var(--surface-white-rgb), 0.15);
 }
 
 /* Callout block */
-.markdown-rendered .callout {
-    background-color: rgba(var(--callout-color), 0.12) !important;
-    border: none !important;
-    border-radius: var(--radius-md) !important;
-    backdrop-filter: blur(var(--blur-md)) !important;
-    -webkit-backdrop-filter: blur(var(--blur-md)) !important;
-    box-shadow: var(--shadow-soft-sm) !important;
+.markdown-rendered.markdown-rendered .callout {
+    background-color: rgba(var(--callout-color), 0.12);
+    border: none;
+    border-radius: var(--radius-md);
+    backdrop-filter: blur(var(--blur-md));
+    -webkit-backdrop-filter: blur(var(--blur-md));
+    box-shadow: var(--shadow-soft-sm);
 }
 
-/* Spoiler-answer block (hides quiz answers/spoilers until hovered) */
+/* Spoiler-answer block (hides quiz answers/spoilers until hovered) — a
+   custom class of yours, not something any theme also targets, so there
+   was never really a cascade fight here to begin with. */
 .spoiler-answer {
-    color: transparent !important;
-    background-color: rgba(var(--surface-white-rgb), 0.4) !important;
+    color: transparent;
+    background-color: rgba(var(--surface-white-rgb), 0.4);
     border-radius: var(--radius-md);
     padding: 0 8px;
     cursor: pointer;
     transition: all 0.2s ease;
-    text-shadow: none !important;
+    text-shadow: none;
 }
 
 /* Spoiler-answer block, hovered: reveal text and fade the background */
 .spoiler-answer:hover {
-    color: var(--text-color-normal) !important;
-    background-color: rgba(var(--surface-white-rgb), 0.1) !important;
+    color: var(--text-color-normal);
+    background-color: rgba(var(--surface-white-rgb), 0.1);
 }
